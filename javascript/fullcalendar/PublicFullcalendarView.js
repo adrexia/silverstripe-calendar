@@ -4,13 +4,16 @@ var PublicFullcalendarView;
 	PublicFullcalendarView = function(holder, calendarUrl, options) {
 		var $this = this;
 		$this.holder = holder;
-		$this.calendarUrl = calendarUrl;
+
+		$this.calendarUrl = calendarUrl,
+		baseURL = $('base').attr('href');
 
 		//default options
 		//Note that these are mostly for illustration purposes,
 		//and will be overwritten by CalendarConfig, and in turn by each site's individual config
 		$this.options = {
-			controllerUrl: '/fullcalendar/',
+
+			controllerUrl: baseURL + '/fullcalendar/',
 			fullcalendar: {
 				header: {
 					left: 'prev, next',
@@ -283,4 +286,5 @@ var PublicFullcalendarView;
 
 
 	}
+
 })(jQuery);
