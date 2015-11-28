@@ -1,162 +1,151 @@
 <?php
-
 /**
  * Calendar Admin
  *
  * @package calendar
  * @subpackage admin
  */
-class CalendarAdmin extends ModelAdmin implements PermissionProvider
-{
+class CalendarAdmin extends LeftAndMain implements PermissionProvider {
 
-    public static $menu_title = "Calendar";
-    public static $url_segment = "calendar";
+	static $menu_title = "Events";
+	static $url_segment = "calendar";
+	static $menu_icon = "calendar/images/icons/calendar.png";
 
     private static $allowed_actions = array(
 		'CalendarsForm',
 		'CategoriesForm',
-        'EventsForm'
+		'categories'
 	);
-    
-    private static $managed_models = array(
-        'PublicEvent',
-        'PublicEventCategory',
-        'PublicCalendar'
-    );
-    
-    private static $model_importers = array(
-        'PublicEvent' => 'EventCsvBulkLoader',
-        'PublicEventCategory' => 'CsvBulkLoader',
-        'PublicCalendar' => 'CsvBulkLoader'
-    );
-    
-    public static $menu_icon = "calendar/images/icons/calendar.png";
 
-    public function init()
-    {
-        parent::init();
+	public function init() {
+		parent::init();
 
 
-        //CSS/JS Dependencies - currently not much there
-        Requirements::css("calendar/css/admin/CalendarAdmin.css");
-        Requirements::javascript("calendar/javascript/admin/CalendarAdmin.js");
-    }
+		//CSS/JS Dependencies - currently not much there
+		Requirements::css("calendar/css/admin/CalendarAdmin.css");
+		Requirements::javascript("calendar/javascript/admin/CalendarAdmin.js");
+	}
 
-    public function getModelClass()
-    {
-        return $this->sanitiseClassName($this->modelClass);
-    }
-    
-    public function getManagedModels()
-    {
-        // Unset managed models according to config
-        /** @todo change to use config API */
-        $models = parent::getManagedModels();
-        if (!$this->calendarsEnabled() 
-            && isset($models['PublicCalendar'])) {
-            unset($models['PublicCalendar']);
-        }
-        if (!$this->categoriesEnabled()
-            && isset($models['PublicCalendar'])) {
-            unset($models['PublicEventCategory']);
-        }
-        return $models;
-    }
-    
-	protected function determineFormClass()
-    {
-		switch ($this->modelClass) {
-			case 'PublicCalendar':
-				$class = 'CalendarsForm';
-				break;
-			case 'PublicEventCategory':
-                $class = 'CategoriesForm';
-				break;
-            case 'PublicEvent':
-                $class = 'EventsForm';
-				break;
-            default:
-                $class = 'CMSForm';
-				break;
+	public function ComingEventsForm(){
+		$form = new ComingEventsForm($this, "ComingEventsForm");
+		$form->addExtraClass('cms-edit-form cms-panel-padded center ' . $this->BaseCSSClasses());
+		return $form;
+	}
+	public function PastEventsForm(){
+		$form = new PastEventsForm($this, "PastEventsForm");
+		$form->addExtraClass('cms-edit-form cms-panel-padded center ' . $this->BaseCSSClasses());
+		return $form;
+	}
+	public function CalendarsForm(){
+		$form = new CalendarsForm($this, "CalendarsForm");
+		$form->addExtraClass('cms-edit-form cms-panel-padded center ' . $this->BaseCSSClasses());
+		return $form;
+	}
+	public function CategoriesForm(){
+		$form = new CategoriesForm($this, "CategoriesForm");
+		$form->addExtraClass('cms-edit-form cms-panel-padded center ' . $this->BaseCSSClasses());
+		return $form;
+	}
+
+
+
+	public function SubTitle(){
+		$str = 'Coming Events';
+		$a = $this->Action;
+		if ($a == 'pastevents') {
+			$str = 'Past Events';
+		}
+		if ($a == 'calendars') {
+			$str = 'Calendars';
+		}
+		if ($a == 'categories') {
+			$str = 'Categories';
+		}
+		return $str;
+	}
+
+	public function CalendarsEnabled(){
+		return CalendarConfig::subpackage_enabled('calendars');
+	}
+	public function CategoriesEnabled(){
+		return CalendarConfig::subpackage_enabled('categories');
+	}
+
+
+
+	/**
+	 * Action "pastevents"
+	 * @param type $request
+	 * @return SS_HTTPResponse
+	 */
+	public function pastevents($request) {
+		return $this->getResponseNegotiator()->respond($request);
+	}
+
+	/**
+	 * Action "calendars"
+	 * @param type $request
+	 * @return SS_HTTPResponse
+	 */
+	public function calendars($request) {
+		if ($this->CalendarsEnabled()) {
+			return $this->getResponseNegotiator()->respond($request);
 		}
         
         return $class;
 	}
-    
-    public function getEditForm($id = null, $fields = null) {
-		$list = $this->getList();
-		$exportButton = new GridFieldExportButton('buttons-before-left');
-		$exportButton->setExportColumns($this->getExportFields());
-		$listField = GridField::create(
-			$this->sanitiseClassName($this->modelClass),
-			false,
-			$list,
-			$fieldConfig = GridFieldConfig_RecordEditor::create($this->stat('page_length'))
-				->addComponent($exportButton)
-				->removeComponentsByType('GridFieldFilterHeader')
-				->addComponents(new GridFieldPrintButton('buttons-before-left'))
-		);
 
-		// Validation
-		if(singleton($this->modelClass)->hasMethod('getCMSValidator')) {
-			$detailValidator = singleton($this->modelClass)->getCMSValidator();
-			$listField->getConfig()->getComponentByType('GridFieldDetailForm')->setValidator($detailValidator);
+	/**
+	 * Action "categories"
+	 * @param type $request
+	 * @return SS_HTTPResponse
+	 */
+	public function categories($request) {
+		if ($this->CategoriesEnabled()) {
+			return $this->getResponseNegotiator()->respond($request);
 		}
-        
-        $formClass = $this->determineFormClass();
-        
-		$form = $formClass::create(
-			$this,
-			'EditForm',
-			new FieldList($listField),
-			new FieldList()
-		)->setHTMLID('Form_EditForm');
-		$form->setResponseNegotiator($this->getResponseNegotiator());
-		$form->addExtraClass('cms-edit-form cms-panel-padded center');
-		$form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
-		$editFormAction = Controller::join_links($this->Link($this->sanitiseClassName($this->modelClass)), 'EditForm');
-		$form->setFormAction($editFormAction);
-		$form->setAttribute('data-pjax-fragment', 'CurrentForm');
-
-		$this->extend('updateEditForm', $form);
-
-		return $form;
 	}
 
-    protected function calendarsEnabled()
-    {
-        return CalendarConfig::subpackage_enabled('calendars');
-    }
+	public function canCreate($member = null) {
+		return Permission::check('EVENT_CREATE');
+	}
+	public function canEdit($member = null) {
+		return Permission::check('EVENT_EDIT');
+	}
+	public function canDelete($member = null) {
+		return Permission::check('EVENT_DELETE');
+	}
+	public function canView($member = null) {
+		return Permission::check('CMS_ACCESS_EventAdmin');
+	}
 
-    protected function categoriesEnabled()
-    {
-        return CalendarConfig::subpackage_enabled('categories');
-    }
-
-    public function providePermissions()
-    {
-        $title = LeftAndMain::menu_title_for_class($this->class);
-        return array(
-            "CMS_ACCESS_CalendarAdmin" => array(
-                'name' => _t('CMSMain.ACCESS', "Access to '{title}' section", array('title' => $title)),
-                'category' => _t('Permission.CMS_ACCESS_CATEGORY', 'CMS Access'),
-                'help' => 'Allow access to calendar management module.'
-            ),
-            "CALENDAR_MANAGE" => array(
-                'name' => _t('CalendarAdmin.CALENDAR_MANAGE', 'Manage calendars'),
-                'category' => _t('CalendarAdmin.CALENDAR_PERMISSION_CATEGORY', 'Calender'),
-                'help' => 'Allow creating, editing, and deleting calendars.'
-            ),
-            "EVENTCATEGORY_MANAGE" => array(
-                'name' => _t('CalendarAdmin.EVENTCATEGORY_MANAGE', 'Manage event categories'),
-                'category' => _t('CalendarAdmin.CALENDAR_PERMISSION_CATEGORY', 'Calender'),
-                'help' => 'Allow creating, editing, and deleting event categories.'
-            ),
-            "EVENT_MANAGE" => array(
-                'name' => _t('CalendarAdmin.EVENT_MANAGE', 'Manage events'),
-                'category' => _t('CalendarAdmin.CALENDAR_PERMISSION_CATEGORY', 'Calender'),
-                'help' => 'Allow creating, editing, and deleting events.'
-            )
-        );
-    }
+	/**
+	 * Get an array of {@link Permission} definitions that this object supports
+	 *
+	 * @return array
+	 */
+	public function providePermissions() {
+		return array(
+			'CMS_ACCESS_EventAdmin' => array(
+				'name' => "Access to 'Events' section",
+				'category' => 'CMS Access'
+			),
+			'EVENT_VIEW' => array(
+				'name' => 'View events',
+				'category' => 'Events',
+			),
+			'EVENT_EDIT' => array(
+				'name' => 'Edit events',
+				'category' => 'Events',
+			),
+			'EVENT_DELETE' => array(
+				'name' => 'Delete events',
+				'category' => 'Events',
+			),
+			'EVENT_CREATE' => array(
+				'name' => 'Create events',
+				'category' => 'Events'
+			)
+		);
+	}
 }
