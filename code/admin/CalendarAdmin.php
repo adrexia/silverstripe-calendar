@@ -1,18 +1,14 @@
 <?php
-/** 
+/**
  * Calendar Admin
  *
  * @package calendar
  * @subpackage admin
  */
-class CalendarAdmin extends LeftAndMain {
+class CalendarAdmin extends LeftAndMain implements PermissionProvider {
 
-	static $menu_title = "Calendar";
+	static $menu_title = "Events";
 	static $url_segment = "calendar";
-	
-	//static $menu_priority = 100;
-	//static $url_priority = 30;
-	
 	static $menu_icon = "calendar/images/icons/calendar.png";
 
 	private static $allowed_actions = array(
@@ -23,56 +19,17 @@ class CalendarAdmin extends LeftAndMain {
 		'CalendarsForm',
 		'CategoriesForm',
 		'categories'
-	);	
-	
-	
-//	static $url_handlers = array (
-//		
-//		//'panel/$ID' => 'handlePanel',
-//		'$Action!' => '$Action',
-//		'' => 'index'
-//	);
-
+	);
 
 	public function init() {
 		parent::init();
-		
-		
+
+
 		//CSS/JS Dependencies - currently not much there
 		Requirements::css("calendar/css/admin/CalendarAdmin.css");
 		Requirements::javascript("calendar/javascript/admin/CalendarAdmin.js");
 	}
 
-
-//	public function getEditForm($id = null, $fields = null) {
-//	
-//		$form = null;
-//
-//		switch ($this->Action) {
-//			case 'index':
-//				$form = new ComingEventsForm($this, "EditForm");
-//				break;
-//			case 'pastevents':
-//				$form = new PastEventsForm($this, "EditForm");
-//				break;
-//			case 'calendars':
-//				$form = new CalendarsForm($this, "EditForm");
-//				break;
-//			case 'index':
-//				$form = new CategoriesForm($this, "EditForm");
-//				break;
-//		}		
-//		
-//		
-//		$form->addExtraClass('cms-edit-form cms-panel-padded center ' . $this->BaseCSSClasses());
-//		$form->loadDataFrom($this->request->getVars());
-//		
-//		$this->extend('updateEditForm', $form);
-//
-//		return $form;
-//	}
-	
-	
 	public function ComingEventsForm(){
 		$form = new ComingEventsForm($this, "ComingEventsForm");
 		$form->addExtraClass('cms-edit-form cms-panel-padded center ' . $this->BaseCSSClasses());
@@ -93,8 +50,8 @@ class CalendarAdmin extends LeftAndMain {
 		$form->addExtraClass('cms-edit-form cms-panel-padded center ' . $this->BaseCSSClasses());
 		return $form;
 	}
-	
-	
+
+
 
 	public function SubTitle(){
 		$str = 'Coming Events';
@@ -110,16 +67,16 @@ class CalendarAdmin extends LeftAndMain {
 		}
 		return $str;
 	}
-	
+
 	public function CalendarsEnabled(){
 		return CalendarConfig::subpackage_enabled('calendars');
 	}
 	public function CategoriesEnabled(){
 		return CalendarConfig::subpackage_enabled('categories');
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Action "pastevents"
 	 * @param type $request
@@ -128,7 +85,7 @@ class CalendarAdmin extends LeftAndMain {
 	public function pastevents($request) {
 		return $this->getResponseNegotiator()->respond($request);
 	}
-	
+
 	/**
 	 * Action "calendars"
 	 * @param type $request
@@ -139,7 +96,7 @@ class CalendarAdmin extends LeftAndMain {
 			return $this->getResponseNegotiator()->respond($request);
 		}
 	}
-	
+
 	/**
 	 * Action "categories"
 	 * @param type $request
@@ -150,11 +107,47 @@ class CalendarAdmin extends LeftAndMain {
 			return $this->getResponseNegotiator()->respond($request);
 		}
 	}
-	
-	
 
+	public function canCreate($member = null) {
+		return Permission::check('EVENT_CREATE');
+	}
+	public function canEdit($member = null) {
+		return Permission::check('EVENT_EDIT');
+	}
+	public function canDelete($member = null) {
+		return Permission::check('EVENT_DELETE');
+	}
+	public function canView($member = null) {
+		return Permission::check('CMS_ACCESS_EventAdmin');
+	}
+
+	/**
+	 * Get an array of {@link Permission} definitions that this object supports
+	 *
+	 * @return array
+	 */
+	public function providePermissions() {
+		return array(
+			'CMS_ACCESS_EventAdmin' => array(
+				'name' => "Access to 'Events' section",
+				'category' => 'CMS Access'
+			),
+			'EVENT_VIEW' => array(
+				'name' => 'View events',
+				'category' => 'Events',
+			),
+			'EVENT_EDIT' => array(
+				'name' => 'Edit events',
+				'category' => 'Events',
+			),
+			'EVENT_DELETE' => array(
+				'name' => 'Delete events',
+				'category' => 'Events',
+			),
+			'EVENT_CREATE' => array(
+				'name' => 'Create events',
+				'category' => 'Events'
+			)
+		);
+	}
 }
-
-
-
-
