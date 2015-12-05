@@ -4973,7 +4973,6 @@ function DayEventRenderer() {
 
 
 	function getRowTops(rowDivs) {
-		console.log(rowDivs);
 		var i, j;
 		var tops = [];
 		for (i=0; i<rowDivs.length; i++) {
