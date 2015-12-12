@@ -24,7 +24,6 @@ class Event extends DataObject {
 
 	static $summary_fields = array(
 		'Title' => 'Title',
-		'Calendar.Title' => 'Calendar',
 		'StartDateTime' => 'Date and Time',
 		'DatesAndTimeframe' => 'Presentation String',
 		//'Calendar.Title' => 'Calendar'
@@ -33,7 +32,6 @@ class Event extends DataObject {
 	function summaryFields(){
 		return array(
 			'Title' => 'Title',
-			'Calendar.Title'   => 'Calendar',
 			'StartDateTime' => 'Date and Time',
 			'DatesAndTimeframe' => 'Presentation String'
 		);
@@ -426,5 +424,5 @@ class Event extends DataObject {
 	public function canView($member = null) {
 		return Permission::check('EVENT_VIEW');
 	}
-	
+
 }
