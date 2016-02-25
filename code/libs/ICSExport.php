@@ -170,17 +170,6 @@ class ICSExport
 				}
 
 
-		// check if all needed values are set if not throw exception
-		if(!isset($arrEventParts['UID']) ||
-		   !isset($arrEventParts['DTSTAMP']) ||
-		   !isset($arrEventParts['DTSTART']) ||
-			!isset($arrEventParts['DTEND']) 
-		   )
-		{
-					Debug::dump($arrEventParts);
-		  throw new Exception('at least one missing value');
-		}
-
 		// add event parts to return string
 		foreach($arrEventParts as $strKey => $strValue)
 		{
