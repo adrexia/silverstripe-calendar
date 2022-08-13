@@ -87,6 +87,7 @@ class CalendarPage_Controller extends Page_Controller {
 
 			$url = $this->Link();
 			$fullcalendarjs = $s['calendarpage']['fullcalendar_js_settings'];
+            $controllerUrl = CalendarHelper::add_preview_params($s['calendarpage']['controllerUrl'],$this->data());
 
 			//shaded events
 			$shadedEvents = 'false';

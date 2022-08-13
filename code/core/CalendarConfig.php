@@ -214,67 +214,50 @@ class CalendarConfig
 
             //Enabling calendars
             if (self::subpackage_enabled('calendars')) {
-                if ($ssversion == '3.0') {
-                    Object::add_extension('Event', 'EventCalendarExtension');
-                } else {
-                    Event::add_extension('EventCalendarExtension');
-                }
+              
+                Event::add_extension('EventCalendarExtension');
+                
                 $s = self::subpackage_settings('calendars');
                 if ($s['colors']) {
-                    if ($ssversion == '3.0') {
-                        Object::add_extension('Calendar', 'CalendarColorExtension');
-                    } else {
-                        Calendar::add_extension('CalendarColorExtension');
-                    }
+                
+                    Calendar::add_extension('CalendarColorExtension');
+                    
                 }
                 if ($s['shading']) {
-                    if ($ssversion == '3.0') {
-                        Object::add_extension('Calendar', 'ShadedCalendarExtension');
-                    } else {
+                    
                         Calendar::add_extension('ShadedCalendarExtension');
-                    }
+                    
                 }
             }
             //Enabling categories
             if (self::subpackage_enabled('categories')) {
-                if ($ssversion == '3.0') {
-                    Object::add_extension('Event', 'EventCategoryExtension');
-                } else {
+               
                     Event::add_extension('EventCategoryExtension');
-                }
+                
             }
             //Enabling Event Page
             if (self::subpackage_setting('pagetypes', 'enable_eventpage')) {
-                if ($ssversion == '3.0') {
-                    Object::add_extension('Event', 'EventHasEventPageExtension');
-                } else {
+                
                     Event::add_extension('EventHasEventPageExtension');
-                }
+                
             }
             //Enabling debug mode
             if (self::subpackage_enabled('debug')) {
-                if ($ssversion == '3.0') {
-                    Object::add_extension('Event', 'EventDebugExtension');
-                } else {
+                
                     Event::add_extension('EventDebugExtension');
-                }
+                
             }
             //Enabling registrations
             if (self::subpackage_enabled('registrations')) {
-                if ($ssversion == '3.0') {
-                    Object::add_extension('Event', 'EventRegistrationExtension');
-                } else {
+                
                     Event::add_extension('EventRegistrationExtension');
-                }
+                
             }
 
             //Adding URL Segment extension to Calendar (currently done for all but could be made configurable later)
-            Object::add_extension('Calendar', 'DoURLSegmentExtension');
-            if ($ssversion == '3.0') {
-                Object::add_extension('Calendar', 'DoURLSegmentExtension');
-            } else {
-                Calendar::add_extension('DoURLSegmentExtension');
-            }
+          
+            Calendar::add_extension('DoURLSegmentExtension');
+            
         }
     }
 }
