@@ -11,7 +11,11 @@ class CalendarAdmin extends LeftAndMain implements PermissionProvider {
 	static $url_segment = "calendar";
 	static $menu_icon = "calendar/images/icons/calendar.png";
 
-    private static $allowed_actions = array(
+	private static $allowed_actions = array(
+		'pastevents',
+		'calendars',
+		'ComingEventsForm',
+		'PastEventsForm',
 		'CalendarsForm',
 		'CategoriesForm',
 		'categories'
@@ -91,8 +95,6 @@ class CalendarAdmin extends LeftAndMain implements PermissionProvider {
 		if ($this->CalendarsEnabled()) {
 			return $this->getResponseNegotiator()->respond($request);
 		}
-        
-        return $class;
 	}
 
 	/**
