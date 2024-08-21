@@ -147,6 +147,10 @@ class CalendarAdmin extends LeftAndMain implements PermissionProvider {
 			'EVENT_CREATE' => array(
 				'name' => 'Create events',
 				'category' => 'Events'
+			),
+			'EVENT_MANAGE' => array(
+				'name' => 'Manage events',
+				'category' => 'Events'
 			)
 		);
 	}

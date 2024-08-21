@@ -86,6 +86,6 @@ class PublicEvent extends Event
      */
     protected function canManage($member)
     {
-        return Permission::check('ADMIN', 'any', $member) || Permission::check('EVENT_MANAGE', 'any', $member);
+        return Permission::check('ADMIN', 'any', $member) || Permission::check('EVENT_MANAGE', 'any', $member) || Permission::check('EVENT_EDIT', 'any', $member);
     }
 }
